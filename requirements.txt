@@ -1,0 +1,9 @@
+Flask>=2.0
+snscrape
+pytrends
+requests
+pandas
+jinja2
+python-dateutil
+beautifulsoup4
+lxml
