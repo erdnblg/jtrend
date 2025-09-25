@@ -1,38 +1,41 @@
-name: Deploy J-Pop Trending
+name: Build and Deploy Jpop Trends
 
 on:
   push:
     branches:
-      - main
+      - main  # Run workflow on push to main branch
   schedule:
-    - cron: '0 0 * * *' # run daily at midnight UTC
-  workflow_dispatch:
+    - cron: '0 12 * * *'  # Optional: daily at 12:00 UTC
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      # 1. Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
+      # 2. Set up Python
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
+      # 3. Install dependencies
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run update
+      # 4. Run Python script to generate static files
+      - name: Generate static site
         run: |
-          python app.py &
-          sleep 5
-          curl http://127.0.0.1:5000/update
+          python generate_static.py
 
+      # 5. Deploy to GitHub Pages
       - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
+        uses: peaceiris/actions-gh-pages@v6
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./output  # <-- The folder where your script writes index.html
